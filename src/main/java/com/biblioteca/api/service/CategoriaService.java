@@ -39,24 +39,6 @@ public class CategoriaService {
         return toResponseDTO(categoria);
     }
 
-    public CategoriaResponseDTO atualizar(Long id, CategoriaRequestDTO dto) {
-        Categoria categoria = categoriaRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Categoria não encontrada"));
-
-        categoria.setNome(dto.nome());
-        categoria.setDescricao(dto.descricao());
-
-        categoria = categoriaRepository.save(categoria);
-        return toResponseDTO(categoria);
-    }
-
-    public void deletar(Long id) {
-        if (!categoriaRepository.existsById(id)) {
-            throw new EntityNotFoundException("Categoria não encontrada");
-        }
-        categoriaRepository.deleteById(id);
-    }
-
     private CategoriaResponseDTO toResponseDTO(Categoria categoria) {
         return new CategoriaResponseDTO(
                 categoria.getId(),
