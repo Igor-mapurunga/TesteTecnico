@@ -89,6 +89,22 @@ public class LivroService {
         livroRepository.deleteById(id);
     }
 
+    public List<LivroResponseDTO> listarFiltrado(Long categoriaId, Long autorId, Integer anoPublicacao) {
+        return livroRepository.findAll().stream()
+                .filter(livro -> (categoriaId == null || livro.getCategoria().getId().equals(categoriaId)) &&
+                        (autorId == null || livro.getAutor().getId().equals(autorId)) &&
+                        (anoPublicacao == null || livro.getAnoPublicacao().equals(anoPublicacao)))
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<LivroResponseDTO> buscarPorTitulo(String titulo) {
+        return livroRepository.findAll().stream()
+                .filter(livro -> livro.getTitulo().toLowerCase().contains(titulo.toLowerCase()))
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
     private LivroResponseDTO toResponseDTO(Livro livro) {
         Autor autor = livro.getAutor();
         Categoria categoria = livro.getCategoria();
