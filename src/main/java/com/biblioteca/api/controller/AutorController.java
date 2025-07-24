@@ -2,6 +2,7 @@ package com.biblioteca.api.controller;
 
 import com.biblioteca.api.dto.request.AutorRequestDTO;
 import com.biblioteca.api.dto.response.AutorResponseDTO;
+import com.biblioteca.api.dto.response.LivroResponseDTO;
 import com.biblioteca.api.service.AutorService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/autores")
@@ -27,7 +29,7 @@ public class AutorController {
     @GetMapping
     public ResponseEntity<Page<AutorResponseDTO>> listarTodos(
             @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
-        return ResponseEntity.ok(autorService.listarTodos((Pageable) pageable));
+        return ResponseEntity.ok(autorService.listarTodos(pageable));
     }
 
     @GetMapping("/{id}")
@@ -46,5 +48,10 @@ public class AutorController {
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         autorService.deletar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/livros")
+    public List<LivroResponseDTO> listarLivrosDoAutor(@PathVariable Long id) {
+        return autorService.listarPorAutor(id);
     }
 }
