@@ -1,5 +1,6 @@
 package com.biblioteca.api.controller;
 
+import com.biblioteca.api.dto.request.ImportarLivroRequestDTO;
 import com.biblioteca.api.dto.request.LivroRequestDTO;
 import com.biblioteca.api.dto.response.LivroResponseDTO;
 import com.biblioteca.api.service.LivroService;
@@ -53,4 +54,11 @@ public class LivroController {
     public ResponseEntity<List<LivroResponseDTO>> buscarPorTitulo(@RequestParam String titulo) {
         return ResponseEntity.ok(livroService.buscarPorTitulo(titulo));
     }
+
+    @PostMapping("/importar")
+    public ResponseEntity<LivroResponseDTO> importarLivro(@Valid @RequestBody ImportarLivroRequestDTO dto) {
+        LivroResponseDTO livroImportado = livroService.importarLivro(dto);
+        return ResponseEntity.status(201).body(livroImportado);
+    }
+
 }

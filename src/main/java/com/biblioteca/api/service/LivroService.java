@@ -1,8 +1,10 @@
 package com.biblioteca.api.service;
 
+import com.biblioteca.api.dto.request.ImportarLivroRequestDTO;
 import com.biblioteca.api.dto.request.LivroRequestDTO;
 import com.biblioteca.api.dto.response.AutorResponseDTO;
 import com.biblioteca.api.dto.response.CategoriaResponseDTO;
+import com.biblioteca.api.dto.response.DadosLivroDTO;
 import com.biblioteca.api.dto.response.LivroResponseDTO;
 import com.biblioteca.api.model.Autor;
 import com.biblioteca.api.model.Categoria;
@@ -28,6 +30,9 @@ public class LivroService {
 
     @Autowired
     private CategoriaRepository categoriaRepository;
+
+    @Autowired
+    private LivroScrapingService scrapingService;
 
     public LivroResponseDTO criarLivro(LivroRequestDTO dto) {
         Autor autor = autorRepository.findById(dto.autorId())
@@ -104,6 +109,31 @@ public class LivroService {
                 .filter(livro -> livro.getTitulo().toLowerCase().contains(titulo.toLowerCase()))
                 .map(this::toResponseDTO)
                 .collect(Collectors.toList());
+    }
+
+    public LivroResponseDTO importarLivro(ImportarLivroRequestDTO dto) {
+        Autor autor = autorRepository.findById(dto.autorId())
+                .orElseThrow(() -> new EntityNotFoundException("Autor não encontrado"));
+
+        Categoria categoria = categoriaRepository.findById(dto.categoriaId())
+                .orElseThrow(() -> new EntityNotFoundException("Categoria não encontrada"));
+
+        DadosLivroDTO dados = scrapingService.extrairDadosLivro(dto.url());
+
+        boolean existe = livroRepository.findAll().stream()
+                .anyMatch(l -> l.getIsbn().equals(dados.isbn()));
+        if (existe) {
+            throw new RuntimeException("Livro com esse ISBN já existe.");
+        }
+        Livro livro = new Livro();
+        livro.setTitulo(dados.titulo());
+        livro.setIsbn(dados.isbn());
+        livro.setPreco(dados.preco());
+        livro.setAnoPublicacao(dados.anoPublicacao());
+        livro.setAutor(autor);
+        livro.setCategoria(categoria);
+        livro = livroRepository.save(livro);
+        return toResponseDTO(livro);
     }
 
     private LivroResponseDTO toResponseDTO(Livro livro) {
