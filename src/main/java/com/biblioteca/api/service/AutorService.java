@@ -6,10 +6,9 @@ import com.biblioteca.api.model.Autor;
 import com.biblioteca.api.repository.AutorRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class AutorService {
@@ -27,11 +26,9 @@ public class AutorService {
         return toResponseDTO(autor);
     }
 
-    public List<AutorResponseDTO> listarTodos() {
-        return autorRepository.findAll()
-                .stream()
-                .map(this::toResponseDTO)
-                .collect(Collectors.toList());
+    public Page<AutorResponseDTO> listarTodos(Pageable pageable) {
+        return autorRepository.findAll(pageable)
+                .map(this::toResponseDTO);
     }
 
     public AutorResponseDTO buscarPorId(Long id) {
