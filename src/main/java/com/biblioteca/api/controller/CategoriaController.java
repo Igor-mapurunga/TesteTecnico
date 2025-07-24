@@ -2,7 +2,9 @@ package com.biblioteca.api.controller;
 
 import com.biblioteca.api.dto.request.CategoriaRequestDTO;
 import com.biblioteca.api.dto.response.CategoriaResponseDTO;
+import com.biblioteca.api.dto.response.LivroResponseDTO;
 import com.biblioteca.api.service.CategoriaService;
+import com.biblioteca.api.service.LivroService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,9 @@ public class CategoriaController {
     @Autowired
     private CategoriaService categoriaService;
 
+    @Autowired
+    private LivroService livroService;
+
     @PostMapping
     public ResponseEntity<CategoriaResponseDTO> criar(@Valid @RequestBody CategoriaRequestDTO dto) {
         CategoriaResponseDTO criada = categoriaService.criarCategoria(dto);
@@ -28,9 +33,10 @@ public class CategoriaController {
         return ResponseEntity.ok(categoriaService.listarTodas());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<CategoriaResponseDTO> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(categoriaService.buscarPorId(id));
+    @GetMapping("/{id}/livros")
+    public ResponseEntity<List<LivroResponseDTO>> listarLivrosPorCategoria(@PathVariable Long id) {
+        return ResponseEntity.ok(livroService.listarPorCategoria(id));
     }
+
 
 }

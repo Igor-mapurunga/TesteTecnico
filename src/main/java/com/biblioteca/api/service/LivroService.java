@@ -48,9 +48,10 @@ public class LivroService {
         return toResponseDTO(livro);
     }
 
-    public List<LivroResponseDTO> listarTodos() {
-        return livroRepository.findAll()
-                .stream()
+
+    public List<LivroResponseDTO> listarPorCategoria(Long categoriaId) {
+        return livroRepository.findAll().stream()
+                .filter(livro -> livro.getCategoria().getId().equals(categoriaId))
                 .map(this::toResponseDTO)
                 .collect(Collectors.toList());
     }
