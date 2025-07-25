@@ -4,7 +4,6 @@ import com.biblioteca.api.dto.request.CategoriaRequestDTO;
 import com.biblioteca.api.dto.response.CategoriaResponseDTO;
 import com.biblioteca.api.model.Categoria;
 import com.biblioteca.api.repository.CategoriaRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,12 +32,6 @@ public class CategoriaService {
                 .stream()
                 .map(this::toResponseDTO)
                 .collect(Collectors.toList());
-    }
-
-    public CategoriaResponseDTO buscarPorId(Long id) {
-        Categoria categoria = categoriaRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Categoria não encontrada"));
-        return toResponseDTO(categoria);
     }
 
     private CategoriaResponseDTO toResponseDTO(Categoria categoria) {
