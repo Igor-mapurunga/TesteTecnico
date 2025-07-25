@@ -113,6 +113,10 @@ cd biblioteca-api
 
 Acesse em: [http://localhost:8080/api](http://localhost:8080/api)
 
+## ✅Link para uso da colection do postman
+
+https://.postman.co/workspace/Personal-Workspace~75f12a34-1995-4ff1-9f99-2e1350639dbe/collection/42279277-c1ab0b06-9fc5-4996-8d6f-23433d48077a?action=share&creator=42279277
+
 ---
 
 ## ✅ Exemplo de Importação de Livro
