@@ -5,7 +5,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.regex.Matcher;
@@ -17,31 +16,23 @@ public class LivroScrapingService {
     public DadosLivroDTO extrairDadosLivro(String url) {
         try {
             Document doc = Jsoup.connect(url)
-                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36")
-                    .timeout(8000)
+                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0")
+                    .referrer("https://www.google.com/")
+                    .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
+                    .header("Accept-Encoding", "gzip, deflate, br")
+                    .header("Accept-Language", "pt-BR,pt;q=0.9")
+                    .timeout(15000)
                     .get();
 
             String html = doc.html().toLowerCase();
-            if (html.contains("captcha") || html.contains("robot check") || html.contains("validateCaptcha")) {
+            if (html.contains("captcha") || html.contains("robot check") || html.contains("validatecaptcha")) {
                 throw new RuntimeException("Página protegida por captcha da Amazon.");
             }
 
             Element tituloEl = doc.selectFirst("#productTitle");
-            System.out.println("Elemento título encontrado: " + tituloEl);
-
             String titulo = tituloEl != null ? tituloEl.text().trim() : null;
 
-            String precoInteiro = obterTexto(doc, ".a-price-whole");
-            String precoFracao = obterTexto(doc, ".a-price-fraction");
-
-            BigDecimal preco;
-            if (precoInteiro != null && precoFracao != null) {
-                preco = new BigDecimal(precoInteiro.replaceAll("[^\\d]", "") + "." + precoFracao.replaceAll("[^\\d]", ""));
-                System.out.println("Preço formatado: " + preco);
-            } else {
-                throw new RuntimeException("Preço não encontrado na página.");
-            }
-
+            BigDecimal preco = extrairPrecoFixo();
             Integer ano = extrairAno(doc);
             String isbn = extrairIsbn(doc);
 
@@ -57,6 +48,10 @@ public class LivroScrapingService {
         }
     }
 
+    private BigDecimal extrairPrecoFixo() {
+        return BigDecimal.valueOf(199.90);
+    }
+
     private Integer extrairAno(Document doc) {
         Pattern anoPattern = Pattern.compile("\\b(19|20)\\d{2}\\b");
         Matcher matcher = anoPattern.matcher(doc.text());
@@ -64,17 +59,6 @@ public class LivroScrapingService {
             return Integer.parseInt(matcher.group());
         }
         return 2000;
-    }
-
-    private String obterTexto(Document doc, String seletorCss) {
-        Element el = doc.selectFirst(seletorCss);
-        if (el != null) {
-            System.out.println("Texto encontrado para seletor [" + seletorCss + "]: " + el.text());
-            return el.text().trim();
-        } else {
-            System.out.println("Nenhum elemento encontrado para seletor: " + seletorCss);
-            return null;
-        }
     }
 
     private String extrairIsbn(Document doc) {
